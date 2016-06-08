@@ -2,22 +2,22 @@ require 'json'
 
 class Flash
   attr_accessor :now
-
   def initialize(req)
     if req.cookies['_rails_lite_app_flash']
-      @flash = JSON.parse(req.cookies['_rails_lite_app_flash'])
+      @now = JSON.parse(req.cookies['_rails_lite_app_flash'])
     end
-    @flash ||= {}
-    @now = {}
+    @now ||= {}
+    @flash = {}
   end
 
   def [](key)
-    @flash[key]
+    @flash[key] || @now[key]
   end
 
   def []=(key, val)
     @flash[key] = val
   end
+
 
   # serialize the hash into json and save in a cookie
   # add to the responses cookies

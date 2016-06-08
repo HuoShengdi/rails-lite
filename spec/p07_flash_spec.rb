@@ -61,7 +61,7 @@ describe Flash do
       flash.now["abc"] = "xyz"
     end
     it "reads data from flash.now" do
-      expect(flash.now["abc"]).to eq("xyz")
+      expect(flash["abc"]).to eq("xyz")
     end
 
     it "does not persist flash.now data" do

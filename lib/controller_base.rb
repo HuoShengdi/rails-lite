@@ -3,7 +3,6 @@ require 'active_support/core_ext'
 require 'active_support/inflector'
 require 'erb'
 require_relative './session'
-require 'byebug'
 
 class ControllerBase
   attr_reader :req, :res, :params
@@ -34,6 +33,7 @@ class ControllerBase
   # Raise an error if the developer tries to double render.
   def render_content(content, content_type)
     @res['Content-Type'] = content_type
+    form_authenticity_token
     @res.write(content)
     session.store_session(@res)
     raise "already rendered" if @already_built_response
@@ -59,6 +59,31 @@ class ControllerBase
     self.send(name)
     unless @already_built_response
       render(name)
+    end
+  end
+
+  def form_authenticity_token
+    @token ||= SecureRandom.urlsafe_base64(16)
+    @res.set_cookie('authenticity_token', @token)
+    @token
+  end
+
+  def self.protect_from_forgery
+    define_method(:invoke_action) do |name|
+      self.send(name)
+      unless @req.request_method == "GET"
+        check_authenticity_token
+      end
+      unless @already_built_response
+          render(name)
+      end
+    end
+  end
+
+  def check_authenticity_token
+    if (@params['authenticity_token'] != @req.cookies['authenticity_token']) || (
+      @params['authenticity_token'] == nil)
+      raise "Invalid authenticity token"
     end
   end
 end
