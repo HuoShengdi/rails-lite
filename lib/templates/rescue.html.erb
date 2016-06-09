@@ -4,6 +4,27 @@
 <br>
 <%= e.message %>
 <br>
-<% path = e.backtrace[0] %>
 <br>
-<p><%= e.backtrace %></p>
+<% params = e.backtrace[0].match(/(?<path>^.*\.rb):(?<line>\d*)/) %>
+<% path = params[:path] %>
+<% line = params[:line].to_i %>
+<% File.open(path, "r") do |f| %>
+  <% while line > 2 %>
+    <%line -= 1 %>
+    <%f.gets%>
+  <% end %>
+  <% 3.times do %>
+    <%= f.gets %>
+    <br>
+  <% end %>
+<% end %>
+
+
+<br>
+<p>
+  <% e.backtrace[0..3].each do |line| %>
+    <%= line %>
+    <br>
+
+  <% end %>
+</p>

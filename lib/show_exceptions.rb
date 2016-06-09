@@ -1,5 +1,4 @@
 require 'erb'
-require 'byebug'
 
 class ShowExceptions
   attr_accessor :app
@@ -25,7 +24,6 @@ class ShowExceptions
     template = ERB.new(File.read(path))
     result = template.result(binding)
     render_content(result, 'text/html')
-    debugger
   end
 
   def render_content(content, content_type)
